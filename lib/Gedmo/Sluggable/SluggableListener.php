@@ -292,7 +292,7 @@ class SluggableListener extends MappedEventSubscriber
             $generatedSlug = $preferedSlug;
             $sameSlugs = array();
             foreach ((array)$result as $list) {
-                $sameSlugs[] = $list['slug'];
+                $sameSlugs[] = $list[$config['slug']];
             }
 
             $i = pow(10, $this->exponent);
@@ -330,9 +330,9 @@ class SluggableListener extends MappedEventSubscriber
     {
         $result = array();
         if (isset($this->persistedSlugs[$class][$slugField])) {
-            array_walk($this->persistedSlugs[$class][$slugField], function($val) use ($preferedSlug, &$result) {
+            array_walk($this->persistedSlugs[$class][$slugField], function($val) use ($preferedSlug, &$result, $slugField) {
                 if (preg_match("@^{$preferedSlug}.*@smi", $val)) {
-                    $result[] = array('slug' => $val);
+                    $result[] = array($slugField => $val);
                 }
             });
         }
@@ -350,7 +350,7 @@ class SluggableListener extends MappedEventSubscriber
     private function filterSimilarSlugs(array &$slugs, array &$config, $prefered)
     {
         foreach ($slugs as $key => $similar) {
-            if (!preg_match("@{$prefered}($|{$config['separator']}[\d]+$)@smi", $similar['slug'])) {
+            if (!preg_match("@{$prefered}($|{$config['separator']}[\d]+$)@smi", $similar[$config['slug']])) {
                 unset($slugs[$key]);
             }
         }
